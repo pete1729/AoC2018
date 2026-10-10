@@ -1,43 +1,53 @@
 import itertools
 import sys
+from collections import Counter
 
 
 def parse(filename):
-    changes = []
+    lines = []
     with open(filename, encoding="utf-8") as file:
         for line in file:
-            changes.append(int(line))
-    return changes
+            lines.append(line.strip())
+    return lines
 
 
-def part1(changes):
-    return sum(changes)
+def part1(lines):
+    two_counts = 0
+    three_counts = 0
+    
+    for line in lines:
+        binary_two = 0
+        binary_three = 0
+        char_counts = Counter(line)
+        for char_count in char_counts.most_common():
+            if char_count[1] == 2:
+                binary_two = 1
+            if char_count[1] == 3:
+                binary_three = 1
+        two_counts += binary_two
+        three_counts += binary_three
+
+    return two_counts*three_counts
 
 
-def part2(changes):
-    curr_freq = 0
-    frequencies = {0}
-    for change in itertools.cycle(changes):
-        curr_freq += change
-        if curr_freq in frequencies:
-            return curr_freq
-        frequencies.add(curr_freq)
+def part2(lines):
+    for i,line in enumerate(lines):
+        for j in range(i,len(lines)):
+            match_differences = sum(a != b for a, b in zip(lines[i], lines[j]))
+            if match_differences == 1:
+                new_line_chars = [a for a, b in zip(lines[i], lines[j]) if a == b]
+                output_string = ""
+                for char in new_line_chars:
+                    output_string += char
+                return output_string
 
 
 if __name__ == "__main__":
     filename = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
-    changes = parse(filename)
+    lines = parse(filename)
 
-    assert part1([+1, -2, +3, +1]) == 3
-    assert part1([+1, +1, +1]) == 3
-    assert part1([+1, +1, -2]) == 0
-    assert part1([-1, -2, -3]) == -6
+    assert part1(["abcdef", "bababc", "abbcde", "abcccd", "aabcdd", "abcdee", "ababab"]) == 12
+    assert part2(["abcde", "fghij", "klmno", "pqrst", "fguij", "axcye", "wvxyz"]) == "fgij"
 
-    assert part2([+1, -2, +3, +1]) == 2
-    assert part2([+1, -1]) == 0
-    assert part2([+3, +3, +4, -2, -4]) == 10
-    assert part2([-6, +3, +8, +5, -6]) == 5
-    assert part2([+7, +7, -2, -7, -4]) == 14
-
-    print("Resulting Frequency:", part1(changes))
-    print("First frequency reached twice:", part2(changes))
+    print("Product of two and three counts:", part1(lines))
+    print("Common letters:", part2(lines))
