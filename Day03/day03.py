@@ -14,8 +14,8 @@ def parse(filename):
 
 def build_fabric(claims):
     fabric = np.zeros((FABRIC_SIZE, FABRIC_SIZE), dtype=int)
-    for line_split in claims:
-        claim_id, start_x, start_y, x_size, y_size = line_split
+    for claim in claims:
+        claim_id, start_x, start_y, x_size, y_size = claim
         fabric[start_x:start_x + x_size, start_y:start_y + y_size] += 1
     return fabric
 
@@ -27,8 +27,8 @@ def part1(claims):
 
 def part2(claims):
     fabric = build_fabric(claims)
-    for line_split in claims:
-        claim_id, start_x, start_y, x_size, y_size = line_split
+    for claim in claims:
+        claim_id, start_x, start_y, x_size, y_size = claim
         area = fabric[start_x:start_x + x_size, start_y:start_y + y_size]
         if (area == 1).all():
             return claim_id
